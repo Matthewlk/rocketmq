@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import org.apache.rocketmq.common.message.MessageExt;
 
 public class CachedQueue {
+    //Attention 为什么要用treeMap
     private final TreeMap<Long, MessageExt> msgCachedTable = new TreeMap<Long, MessageExt>();
 
     public TreeMap<Long, MessageExt> getMsgCachedTable() {
