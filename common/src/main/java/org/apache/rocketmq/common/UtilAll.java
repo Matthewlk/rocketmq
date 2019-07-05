@@ -307,10 +307,12 @@ public class UtilAll {
         byte[] result = src;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(src.length);
         java.util.zip.Deflater defeater = new java.util.zip.Deflater(level);
+        //装饰器模式
         DeflaterOutputStream deflaterOutputStream = new DeflaterOutputStream(byteArrayOutputStream, defeater);
         try {
             deflaterOutputStream.write(src);
             deflaterOutputStream.finish();
+            //关闭了deflaterOutputStream同时也会调用byteArrayOutputStream.close()
             deflaterOutputStream.close();
             result = byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
@@ -318,6 +320,7 @@ public class UtilAll {
             throw e;
         } finally {
             try {
+                //保险起见再次调用
                 byteArrayOutputStream.close();
             } catch (IOException ignored) {
             }
