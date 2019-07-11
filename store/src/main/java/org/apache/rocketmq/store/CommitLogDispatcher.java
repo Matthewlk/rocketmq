@@ -22,5 +22,12 @@ package org.apache.rocketmq.store;
  */
 public interface CommitLogDispatcher {
 
+    /**
+     * 执行调度请求
+     * 1.非事务消息或事务提交消息建立"消息位置信息"到ConsumeQueue
+     * 2.建立索引信息到IndexFile
+     *
+     * @param request
+     */
     void dispatch(final DispatchRequest request);
 }
