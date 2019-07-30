@@ -121,7 +121,7 @@ public class RouteInfoManager {
         try {
             try {
                 this.lock.writeLock().lockInterruptibly();
-
+                //判断broker集群是否存在
                 Set<String> brokerNames = this.clusterAddrTable.get(clusterName);
                 if (null == brokerNames) {
                     brokerNames = new HashSet<String>();
@@ -130,7 +130,7 @@ public class RouteInfoManager {
                 brokerNames.add(brokerName);
 
                 boolean registerFirst = false;
-
+                //维护brokerData信息
                 BrokerData brokerData = this.brokerAddrTable.get(brokerName);
                 if (null == brokerData) {
                     registerFirst = true;
@@ -139,31 +139,27 @@ public class RouteInfoManager {
                 }
                 String oldAddr = brokerData.getBrokerAddrs().put(brokerId, brokerAddr);
                 registerFirst = registerFirst || (null == oldAddr);
-
-                if (null != topicConfigWrapper
-                    && MixAll.MASTER_ID == brokerId) {
-                    if (this.isBrokerTopicConfigChanged(brokerAddr, topicConfigWrapper.getDataVersion())
-                        || registerFirst) {
-                        ConcurrentMap<String, TopicConfig> tcTable =
-                            topicConfigWrapper.getTopicConfigTable();
+                //为默认topic自动注册路由信息
+                if (null != topicConfigWrapper && MixAll.MASTER_ID == brokerId) {
+                    if (this.isBrokerTopicConfigChanged(brokerAddr, topicConfigWrapper.getDataVersion()) || registerFirst) {
+                        ConcurrentMap<String, TopicConfig> tcTable = topicConfigWrapper.getTopicConfigTable();
                         if (tcTable != null) {
                             for (Map.Entry<String, TopicConfig> entry : tcTable.entrySet()) {
+                                //根据TopicConfig创建QueueData数据结构,然后更新topicQueueTable
                                 this.createAndUpdateQueueData(brokerName, entry.getValue());
                             }
                         }
                     }
                 }
 
+                //更新BrokerLiveInfo等信息
                 BrokerLiveInfo prevBrokerLiveInfo = this.brokerLiveTable.put(brokerAddr,
-                    new BrokerLiveInfo(
-                        System.currentTimeMillis(),
-                        topicConfigWrapper.getDataVersion(),
-                        channel,
-                        haServerAddr));
+                    new BrokerLiveInfo(System.currentTimeMillis(), topicConfigWrapper.getDataVersion(), channel, haServerAddr));
                 if (null == prevBrokerLiveInfo) {
                     log.info("new broker registered, {} HAServer: {}", brokerAddr, haServerAddr);
                 }
 
+                //注册过滤器Server地址列表
                 if (filterServerList != null) {
                     if (filterServerList.isEmpty()) {
                         this.filterServerTable.remove(brokerAddr);

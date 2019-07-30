@@ -334,19 +334,16 @@ public class DefaultRequestProcessor implements NettyRequestProcessor {
         return response;
     }
 
-    public RemotingCommand getRouteInfoByTopic(ChannelHandlerContext ctx,
-        RemotingCommand request) throws RemotingCommandException {
+    public RemotingCommand getRouteInfoByTopic(ChannelHandlerContext ctx, RemotingCommand request) throws RemotingCommandException {
         final RemotingCommand response = RemotingCommand.createResponseCommand(null);
-        final GetRouteInfoRequestHeader requestHeader =
-            (GetRouteInfoRequestHeader) request.decodeCommandCustomHeader(GetRouteInfoRequestHeader.class);
-
+        final GetRouteInfoRequestHeader requestHeader = (GetRouteInfoRequestHeader) request.decodeCommandCustomHeader(GetRouteInfoRequestHeader.class);
+        //填充TopicRouteData
         TopicRouteData topicRouteData = this.namesrvController.getRouteInfoManager().pickupTopicRouteData(requestHeader.getTopic());
 
         if (topicRouteData != null) {
             if (this.namesrvController.getNamesrvConfig().isOrderMessageEnable()) {
-                String orderTopicConf =
-                    this.namesrvController.getKvConfigManager().getKVConfig(NamesrvUtil.NAMESPACE_ORDER_TOPIC_CONFIG,
-                        requestHeader.getTopic());
+                //如果为顺序消息，则从NameServerKVConfig中获取相关配置信息
+                String orderTopicConf = this.namesrvController.getKvConfigManager().getKVConfig(NamesrvUtil.NAMESPACE_ORDER_TOPIC_CONFIG, requestHeader.getTopic());
                 topicRouteData.setOrderTopicConf(orderTopicConf);
             }
 
