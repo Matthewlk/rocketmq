@@ -20,30 +20,46 @@
  */
 package org.apache.rocketmq.common.protocol.header;
 
+import org.apache.rocketmq.common.sysflag.PullSysFlag;
 import org.apache.rocketmq.remoting.CommandCustomHeader;
 import org.apache.rocketmq.remoting.annotation.CFNotNull;
 import org.apache.rocketmq.remoting.annotation.CFNullable;
 import org.apache.rocketmq.remoting.exception.RemotingCommandException;
 
 public class PullMessageRequestHeader implements CommandCustomHeader {
+    /**
+     * 消费者分组
+     */
     @CFNotNull
     private String consumerGroup;
     @CFNotNull
     private String topic;
     @CFNotNull
     private Integer queueId;
+    /**
+     * 队列开始位置
+     */
     @CFNotNull
     private Long queueOffset;
     @CFNotNull
     private Integer maxMsgNums;
+    /**
+     * @see PullSysFlag
+     */
     @CFNotNull
     private Integer sysFlag;
     @CFNotNull
     private Long commitOffset;
     @CFNotNull
     private Long suspendTimeoutMillis;
+    /**
+     * 订阅表达式
+     */
     @CFNullable
     private String subscription;
+    /**
+     * 订阅版本号
+     */
     @CFNotNull
     private Long subVersion;
     private String expressionType;

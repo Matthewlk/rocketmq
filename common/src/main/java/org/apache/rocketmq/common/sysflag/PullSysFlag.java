@@ -17,8 +17,17 @@
 package org.apache.rocketmq.common.sysflag;
 
 public class PullSysFlag {
+    /**
+     * 标记请求提交消费进度位置
+     */
     private final static int FLAG_COMMIT_OFFSET = 0x1 << 0;
+    /**
+     * 标记请求是否挂起请求
+     */
     private final static int FLAG_SUSPEND = 0x1 << 1;
+    /**
+     * 是否过滤订阅表达式
+     */
     private final static int FLAG_SUBSCRIPTION = 0x1 << 2;
     private final static int FLAG_CLASS_FILTER = 0x1 << 3;
 
