@@ -137,8 +137,7 @@ public class Validators {
 
         if (!regularExpressionMatcher(topic, PATTERN)) {
             throw new MQClientException(String.format(
-                "The specified topic[%s] contains illegal characters, allowing only %s", topic,
-                VALID_PATTERN_STR), null);
+                "The specified topic[%s] contains illegal characters, allowing only %s", topic, VALID_PATTERN_STR), null);
         }
 
         if (topic.length() > CHARACTER_MAX_LENGTH) {

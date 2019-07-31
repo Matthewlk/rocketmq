@@ -22,7 +22,13 @@ import org.apache.rocketmq.client.log.ClientLogger;
 import org.apache.rocketmq.logging.InternalLogger;
 import org.apache.rocketmq.common.message.MessageQueue;
 
+/**
+ * 消息失败策略
+ *
+ * LatencyFaultTolerance的门面类
+ */
 public class MQFaultStrategy {
+
     private final static InternalLogger log = ClientLogger.getLog();
     /**
      * 延迟故障容错，维护每个Broker的发送消息的延迟
@@ -118,7 +124,7 @@ public class MQFaultStrategy {
      *
      * @param brokerName
      * @param currentLatency 延迟
-     * @param isolation 是否隔离。当开启隔离，默认延迟30000.
+     * @param isolation      是否隔离。当开启隔离，默认延迟30000.
      */
     public void updateFaultItem(final String brokerName, final long currentLatency, boolean isolation) {
         if (this.sendLatencyFaultEnable) {
