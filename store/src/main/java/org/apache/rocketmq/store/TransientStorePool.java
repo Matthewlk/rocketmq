@@ -31,7 +31,7 @@ import sun.nio.ch.DirectBuffer;
 public class TransientStorePool {
     private static final InternalLogger log = InternalLoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
     /**
-     * avaliableBuffers个数
+     * available Buffers个数
      */
     private final int poolSize;
 

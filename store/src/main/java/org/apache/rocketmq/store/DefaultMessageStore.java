@@ -169,10 +169,15 @@ public class DefaultMessageStore implements MessageStore {
         boolean result = true;
 
         try {
+            //判断上次退出是否正常
+            //实现机制是Broker在启动时创建${ROCKET_HOME}/store/abort文件
+            //退出时通过JVM钩子函数删除abort文件
+            //下次启动如果abort文件存在，说明Broker是异常退出的
             boolean lastExitOK = !this.isTempFileExist();
             log.info("last shutdown {}", lastExitOK ? "normally" : "abnormally");
 
             if (null != scheduleMessageService) {
+                //加载延迟队列，RocketMQ定时消息相关
                 result = result && this.scheduleMessageService.load();
             }
 
@@ -183,9 +188,9 @@ public class DefaultMessageStore implements MessageStore {
             result = result && this.loadConsumeQueue();
 
             if (result) {
-                this.storeCheckpoint =
-                    new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
-
+                //加载存储检测点
+                this.storeCheckpoint = new StoreCheckpoint(StorePathConfigHelper.getStoreCheckpoint(this.messageStoreConfig.getStorePathRootDir()));
+                //加载索引文件
                 this.indexService.load(lastExitOK);
 
                 this.recover(lastExitOK);
@@ -224,7 +229,7 @@ public class DefaultMessageStore implements MessageStore {
         if (this.scheduleMessageService != null && SLAVE != messageStoreConfig.getBrokerRole()) {
             this.scheduleMessageService.start();
         }
-
+        //是否允许重复转发
         if (this.getMessageStoreConfig().isDuplicationEnable()) {
             this.reputMessageService.setReputFromOffset(this.commitLog.getConfirmOffset());
         } else {
@@ -1234,6 +1239,7 @@ public class DefaultMessageStore implements MessageStore {
     }
 
     private boolean isTempFileExist() {
+
         String fileName = StorePathConfigHelper.getAbortFile(this.messageStoreConfig.getStorePathRootDir());
         File file = new File(fileName);
         return file.exists();
@@ -1767,8 +1773,7 @@ public class DefaultMessageStore implements MessageStore {
         private void doReput() {
             for (boolean doNext = true; this.isCommitLogAvailable() && doNext; ) {
 
-                if (DefaultMessageStore.this.getMessageStoreConfig().isDuplicationEnable()
-                    && this.reputFromOffset >= DefaultMessageStore.this.getConfirmOffset()) {
+                if (DefaultMessageStore.this.getMessageStoreConfig().isDuplicationEnable() && this.reputFromOffset >= DefaultMessageStore.this.getConfirmOffset()) {
                     break;
                 }
                 // 获取从reputFromOffset开始的commitLog对应的MappeFile对应的MappedByteBuffer
@@ -1838,6 +1843,7 @@ public class DefaultMessageStore implements MessageStore {
 
             while (!this.isStopped()) {
                 try {
+                    //执行一次休息1毫秒
                     Thread.sleep(1);
                     this.doReput();
                 } catch (Exception e) {
