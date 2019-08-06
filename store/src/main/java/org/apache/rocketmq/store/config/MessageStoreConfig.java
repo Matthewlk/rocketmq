@@ -49,6 +49,7 @@ public class MessageStoreConfig {
 
     // Only used if TransientStorePool enabled
     // flush data to FileChannel
+    //间隔时间默认200ms
     @ImportantField
     private int commitIntervalCommitLog = 200;
 
@@ -95,6 +96,7 @@ public class MessageStoreConfig {
     // How many pages are to be flushed when flush ConsumeQueue
     private int flushConsumeQueueLeastPages = 2;
     private int flushCommitLogThoroughInterval = 1000 * 10;
+    //两次真实提交最大间隔时间，默认200ms
     private int commitCommitLogThoroughInterval = 200;
     private int flushConsumeQueueThoroughInterval = 1000 * 60;
     @ImportantField

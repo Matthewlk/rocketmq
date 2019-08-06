@@ -952,6 +952,9 @@ public class CommitLog {
         }
     }
 
+    /**
+     * 刷盘线程工作机制
+     */
     class FlushRealTimeService extends FlushCommitLogService {
         //最后flush时间戳
         private long lastFlushTimestamp = 0;
@@ -968,7 +971,7 @@ public class CommitLog {
                 int flushPhysicQueueLeastPages = CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogLeastPages();
 
                 int flushPhysicQueueThoroughInterval =
-                    CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogThoroughInterval();
+                        CommitLog.this.defaultMessageStore.getMessageStoreConfig().getFlushCommitLogThoroughInterval();
 
                 boolean printFlushProgress = false;
 
@@ -982,6 +985,7 @@ public class CommitLog {
 
                 try {
                     if (flushCommitLogTimed) {
+                        //执行一次刷盘任务前先等待指定时间间隔，然后再执行刷盘任务
                         Thread.sleep(interval);
                     } else {
                         this.waitForRunning(interval);
@@ -992,6 +996,7 @@ public class CommitLog {
                     }
 
                     long begin = System.currentTimeMillis();
+                    //刷写到磁盘
                     CommitLog.this.mappedFileQueue.flush(flushPhysicQueueLeastPages);
                     long storeTimestamp = CommitLog.this.mappedFileQueue.getStoreTimestamp();
                     if (storeTimestamp > 0) {
